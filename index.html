@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第二重要极限公式计算器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#10B981',
+                        accent: '#F59E0B',
+                        dark: '#1E293B',
+                        light: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .transition-all-300 {
+                transition: all 300ms ease-in-out;
+            }
+            .shadow-soft {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-dark">
+    <!-- 顶部导航 -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-primary flex items-center">
+                <i class="fa fa-calculator mr-3 text-accent"></i>
+                第二重要极限公式计算器
+            </h1>
+            <div class="hidden md:flex items-center space-x-4">
+                <span class="text-gray-600">
+                    <i class="fa fa-info-circle mr-1"></i> 极限公式: (1 + 1/n)^n
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- 公式展示区 -->
+        <div class="bg-white rounded-xl shadow-soft p-6 mb-8 text-center">
+            <div class="text-[clamp(1.2rem,2vw,1.8rem)] font-semibold mb-4">
+                极限公式: <span class="text-primary">limₙ→∞ (1 + 1/n)ⁿ = e</span>
+            </div>
+            <p class="text-gray-600 max-w-3xl mx-auto">
+                当n趋向于无穷大时，(1 + 1/n)ⁿ的极限值为自然常数e（约等于2.718281828459045）。
+                选择不同的n值，观察公式结果的变化。
+            </p >
+        </div>
+
+        <!-- 控制区和结果区 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <!-- 控制区 -->
+            <div class="bg-white rounded-xl shadow-soft p-6 lg:col-span-1">
+                <h2 class="text-xl font-bold mb-4 text-dark flex items-center">
+                    <i class="fa fa-sliders mr-2 text-accent"></i> 参数设置
+                </h2>
+                
+                <div class="mb-6">
+                    <label for="nValue" class="block text-gray-700 mb-2 font-medium">n 值:</label>
+                    <div class="flex items-center space-x-2">
+                        <input 
+                            type="range" 
+                            id="nValue" 
+                            min="1" 
+                            max="10000000" 
+                            step="1" 
+                            value="100"
+                            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                        >
+                    </div>
+                    <div class="flex items-center mt-2">
+                        <input 
+                            type="number" 
+                            id="nInput" 
+                            min="1" 
+                            max="10000000" 
+                            value="100"
+                            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        >
+                        <span class="ml-2 text-gray-500">/ 10,000,000</span>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2 font-medium">计算结果:</label>
+                    <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
+                        <div class="text-2xl font-bold text-primary" id="result">2.7048138294215285</div>
+                        <div class="text-sm text-gray-500 mt-1">与 e 的误差: <span id="error" class="text-accent">0.0134679990375165</span></div>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button id="btnMin" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-md transition-all-300">
+                        <i class="fa fa-fast-backward mr-1"></i> 最小值
+                    </button>
+                    <button id="btnReset" class="flex-1 bg-primary hover:bg-primary/90 text-white py-2 px-4 rounded-md transition-all-300">
+                        <i class="fa fa-refresh mr-1"></i> 重置
+                    </button>
+                    <button id="btnMax" class="flex-1 bg-accent hover:bg-accent/90 text-white py-2 px-4 rounded-md transition-all-300">
+                        <i class="fa fa-fast-forward mr-1"></i> 最大值
+                    </button>
+                </div>
+
+                <div class="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-lg">
+                    <h3 class="font-medium text-primary mb-2 flex items-center">
+                        <i class="fa fa-lightbulb-o mr-2"></i> 公式说明
+                    </h3>
+                    <p class="text-sm text-gray-600">
+                        第二重要极限公式描述了当n趋向于无穷大时，(1 + 1/n)ⁿ的极限值为自然常数e。
+                        这个极限在微积分、复利计算等领域有重要应用。n值越大，结果越接近e的值。
+                    </p>
+                </div>
+            </div>
+            
+            <!-- 图表展示区 -->
+            <div class="bg-white rounded-xl shadow-soft p-6 lg:col-span-2">
+                <h2 class="text-xl font-bold mb-4 text-dark flex items-center">
+                    <i class="fa fa-line-chart mr-2 text-secondary"></i> 趋势图表
+                </h2>
+                <div class="h-[400px] w-full">
+                    <canvas id="trendChart"></canvas>
+                </div>
+                <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-sm">
+                    <div class="p-2 bg-gray-50 rounded">
+                        <div class="text-gray-500">n=10</div>
+                        <div class="font-medium" id="val10">2.5937</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded">
+                        <div class="text-gray-500">n=100</div>
+                        <div class="font-medium" id="val100">2.7048</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded">
+                        <div class="text-gray-500">n=1000</div>
+                        <div class="font-medium" id="val1000">2.7169</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded">
+                        <div class="text-gray-500">n=10000</div>
+                        <div class="font-medium" id="val10000">2.7181</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 理论说明区 -->
+        <div class="bg-white rounded-xl shadow-soft p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4 text-dark flex items-center">
+                <i class="fa fa-book mr-2 text-primary"></i> 第二重要极限理论
+            </h2>
+            <div class="prose max-w-none">
+                <p class="text-gray-700 mb-4">
+                    第二重要极限公式是微积分中的一个基本极限，其表达式为：
+                </p>
+                <div class="text-center text-lg font-medium my-4">
+                    limₙ→∞ (1 + 1/n)ⁿ = e
+                </div>
+                <p class="text-gray-700 mb-4">
+                    其中e是自然常数，约等于2.718281828459045。这个极限有着广泛的应用：
+                </p>
+                <ul class="list-disc pl-6 text-gray-700 space-y-2 mb-4">
+                    <li>在微积分中用于定义自然指数函数和自然对数函数</li>
+                    <li>在金融领域用于计算连续复利</li>
+                    <li>在概率论中用于描述泊松分布的极限形式</li>
+                    <li>在物理学中用于描述增长和衰减过程</li>
+                </ul>
+                <p class="text-gray-700">
+                    当n的值不断增大时，(1 + 1/n)ⁿ的值会逐渐趋近于e，但永远不会超过e。通过本计算器，
+                    您可以直观地观察到这一收敛过程。
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-6">
+        <div class="container mx-auto px-4 text-center">
+            <p class="mb-2">第二重要极限公式计算器 &copy; 2023</p>
+            <p class="text-sm text-gray-400">自然常数 e ≈ 2.718281828459045</p>
+        </div>
+    </footer>
+
+    <script>
+        // 自然常数e
+        const e = Math.E;
+        let trendChart = null;
+        
+        // DOM元素
+        const nValue = document.getElementById('nValue');
+        const nInput = document.getElementById('nInput');
+        const resultEl = document.getElementById('result');
+        const errorEl = document.getElementById('error');
+        const btnMin = document.getElementById('btnMin');
+        const btnMax = document.getElementById('btnMax');
+        const btnReset = document.getElementById('btnReset');
+        
+        // 预设值显示元素
+        const val10 = document.getElementById('val10');
+        const val100 = document.getElementById('val100');
+        const val1000 = document.getElementById('val1000');
+        const val10000 = document.getElementById('val10000');
+
+        // 计算(1 + 1/n)^n的值
+        function calculateValue(n) {
+            return Math.pow(1 + 1/n, n);
+        }
+        
+        // 更新计算结果
+        function updateResult() {
+            const n = parseInt(nValue.value);
+            const value = calculateValue(n);
+            const error = Math.abs(value - e);
+            
+            resultEl.textContent = value.toFixed(15);
+            errorEl.textContent = error.toFixed(15);
+            
+            // 更新图表中的当前点
+            updateChartCurrentPoint(n, value);
+        }
+        
+        // 初始化图表
+        function initChart() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            
+            // 生成数据点
+            const labels = [1, 10, 100, 1000, 10000, 100000, 1000000, 10000000];
+            const data = labels.map(n => calculateValue(n));
+            
+            // 预设值显示
+            val10.textContent = calculateValue(10).toFixed(4);
+            val100.textContent = calculateValue(100).toFixed(4);
+            val1000.textContent = calculateValue(1000).toFixed(4);
+            val10000.textContent = calculateValue(10000).toFixed(4);
+            
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels.map(String),
+                    datasets: [
+                        {
+                            label: '(1 + 1/n)ⁿ 的值',
+                            data: data,
+                            borderColor: '#4F46E5',
+                            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#4F46E5',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: '自然常数 e',
+                            data: labels.map(() => e),
+                            borderColor: '#F59E0B',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false
+                        },
+                        {
+                            label: '当前值',
+                            data: labels.map((n, i) => i === 1 ? calculateValue(100) : null), // 初始点
+                            pointBackgroundColor: '#10B981',
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            showLine: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'logarithmic',
+                            title: {
+                                display: true,
+                                text: 'n 值 (对数刻度)'
+                            }
+                        },
+                        y: {
+                            min: 2,
+                            max: 3,
+                            title: {
+                                display: true,
+                                text: '计算结果'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw.toFixed(6)}`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 500
+                    }
+                }
+            });
+        }
+        
+        // 更新图表中的当前点
+        function updateChartCurrentPoint(n, value) {
+            if (!trendChart) return;
+            
+            // 在数据集中找到最接近的点
+            const labels = trendChart.data.labels.map(Number);
+            const dataPoints = labels.map((label, index) => {
+                return {index, distance: Math.abs(label - n)};
+            });
+            
+            // 排序找到最近的点
+            dataPoints.sort((a, b) => a.distance - b.distance);
+            
+            // 更新当前点数据
+            const currentPointData = trendChart.data.datasets[2].data.map(() => null);
+            currentPointData[dataPoints[0].index] = value;
+            trendChart.data.datasets[2].data = currentPointData;
+            trendChart.update();
+        }
+        
+        // 事件监听
+        nValue.addEventListener('input', function() {
+            nInput.value = this.value;
+            updateResult();
+        });
+        
+        nInput.addEventListener('input', function() {
+            // 确保值在有效范围内
+            let value = parseInt(this.value) || 1;
+            value = Math.max(1, Math.min(10000000, value));
+            
+            nValue.value = value;
+            updateResult();
+        });
+        
+        // 按钮事件
+        btnMin.addEventListener('click', function() {
+            nValue.value = 1;
+            nInput.value = 1;
+            updateResult();
+        });
+        
+        btnMax.addEventListener('click', function() {
+            nValue.value = 10000000;
+            nInput.value = 10000000;
+            updateResult();
+        });
+        
+        btnReset.addEventListener('click', function() {
+            nValue.value = 100;
+            nInput.value = 100;
+            updateResult();
+        });
+        
+        // 页面加载完成后初始化
+        window.addEventListener('load', function() {
+            initChart();
+            updateResult();
+        });
+    </script>
+</body>
+</html>
